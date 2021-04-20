@@ -13,8 +13,5 @@ trigger MaintenanceRequest on Case (before update, after update) {
         if(closedCases.size() > 0)
             MaintenanceRequestHelper.updateWorkOrders(closedCases);
     }
-    /*    
-    insert closedCases;
-    */
         
 }
