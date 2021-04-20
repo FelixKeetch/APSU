@@ -29,6 +29,7 @@ public with sharing class MaintenanceRequestHelper {
 		}
         if(newCases.size() > 0){
             insert newCases;
+            //TODO When do sObject's Ids get populated? 
             reparentEquipment(newCases);
         }   
         
