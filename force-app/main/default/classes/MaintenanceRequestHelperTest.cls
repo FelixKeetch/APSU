@@ -1,3 +1,12 @@
 public with sharing class MaintenanceRequestHelperTest {
-    // implement scheduled code here
+    @IsTest
+    static void testCreationOfMaintenanceRequest(){
+        
+        Test.startTest();
+        System.runAs(contextuser){
+            
+        }
+        Test.stopTest();
+        
+    }
 }
