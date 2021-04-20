@@ -2,6 +2,7 @@ public with sharing class MaintenanceRequestHelper {
     
     public static void updateWorkOrders(List<Case> cases) {
         List<Case> newCases = new List<Case>();
+        
         for(Case c : cases){
             //Find the shortest cycle
             Decimal shCycle = 0;
@@ -12,26 +13,25 @@ public with sharing class MaintenanceRequestHelper {
             }
             //Create a new Maintenance Request(Changed Case)
             Case newCase = new Case(
-                Vehicle__c = c.Vehicle__c,
                 Type = 'Routine Maintenance',
                 Status = 'New'
             );
+            newCase.Vehicle__c = c.Vehicle__c;
             newCase.Date_Reported__c = Date.today();
             //Save a Closed Maintenance Request's Id:
-            newCase.Preceding_Maintenance_Request_Id__c = c.Id;
-
+            newCase.ParentId = c.Id;
+            newCase.Description = String.valueOf(shCycle);
             //If none of the equipment items has a cycle today's date is set, otherwise -
             // today's date + the shortest cycle
-            newCase.Date_Due__c = (shCycle == 0) ? Date.today(): 
-                Date.today().addDays((Integer)shCycle);
+            newCase.Date_Due__c = Date.Today().addDays((Integer)shCycle);
             newCase.Subject = String.isBlank(c.Subject) ? 'Routine Maintenance Request' : c.Subject;
         	newCases.add(newCase);
 		}
-        reparentEquipment(newCases);
         if(newCases.size() > 0){
             insert newCases;
+            reparentEquipment(newCases);
         }   
-
+        
     }     
     public static void reparentEquipment(List<Case> newCases){
         List<Equipment_Maintenance_Item__c> allEquipmentItems = [SELECT Id, Maintenance_Request__c FROM Equipment_Maintenance_Item__c ];
@@ -39,7 +39,7 @@ public with sharing class MaintenanceRequestHelper {
 
         for(Case c : newCases){
             for(Equipment_Maintenance_Item__c eq : allEquipmentItems){
-                if(eq.Maintenance_Request__c == c.Preceding_Maintenance_Request_Id__c){
+                if(eq.Maintenance_Request__c == c.ParentId){
                     eq.Maintenance_Request__c = c.Id;
                     reparentedEqItems.add(eq);
                 }
@@ -47,7 +47,7 @@ public with sharing class MaintenanceRequestHelper {
             }
         }
 
-        if(reparentedEqItems.size() > 0)
+        if(reparentedEqItems.size()> 0)
             update reparentedEqItems;
 
     }   
