@@ -5,6 +5,7 @@
 // You can also execute the entire file by running the command:
 //     SFDX: Execute Anonymous Apex with Editor Contents
 
-System.enqueueJob(NewS WarehouseCalloutService());
-
+String CRON_EXP = '0 0 1 ? * * *';
+WarehouseSyncSchedule WarehouseSyncScheduleJob = new WarehouseSyncSchedule();
+String jobID = System.schedule('WarehouseSyncScheduleJob', CRON_EXP, WarehouseSyncScheduleJob);
 
