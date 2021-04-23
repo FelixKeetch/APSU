@@ -7,7 +7,6 @@ public with sharing class MaintenanceRequestHelper {
             //Find the shortest cycle
             Decimal shCycle = 0;
             for(Equipment_Maintenance_Item__c eq : c.Equipment_Maintenance_Items__r){
-
                 if(shCycle == 0 || shCycle > eq.Equipment__r.Maintenance_Cycle__c)
                   shCycle = eq.Equipment__r.Maintenance_Cycle__c;
             }
@@ -20,7 +19,7 @@ public with sharing class MaintenanceRequestHelper {
             newCase.Date_Reported__c = Date.today();
             //Save a Closed Maintenance Request's Id:
             newCase.ParentId = c.Id;
-            newCase.Description = String.valueOf(shCycle);
+            
             //If none of the equipment items has a cycle today's date is set, otherwise -
             // today's date + the shortest cycle
             newCase.Date_Due__c = Date.Today().addDays((Integer)shCycle);
@@ -51,6 +50,6 @@ public with sharing class MaintenanceRequestHelper {
         if(reparentedEqItems.size()> 0)
             update reparentedEqItems;
 
-    }   
+    }  
     
 }
