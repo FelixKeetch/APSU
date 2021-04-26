@@ -117,7 +117,6 @@ public with sharing class MaintenanceRequestHelperTest {
     // }
     @isTest
     static void testPositiveCase(){
-        setup();
         Case m = [SELECT Id,
                          Case.Vehicle__r.Id, 
                          (SELECT Id, 
@@ -174,7 +173,29 @@ public with sharing class MaintenanceRequestHelperTest {
         System.assertEquals(m.Vehicle__r.Id, tc.Vehicle__r.Id);
         //Not sure how to test due date without copying trigger code.                                                                                         
     }
-
-
+    @isTest
+    static void negativeCaseTest(){
+        Vehicle__c v = [SELECT Id, Name FROM Vehicle__c LIMIT 1];
+        Case mtRq = new Case(Origin = 'Web',
+                            Description = 'Negative Case' ,
+                            Status = 'Working',
+                            Subject = 'Subject for the Negative Case',
+                            Vehicle__c = v.Id);
+        mtRq.Status = 'Closed';
+        upsert mtRq;
+        List<Case> triggerCaseList = [SELECT Id,
+                                            Case.Vehicle__r.Id, 
+                                            (SELECT Id, 
+                                                    Name, 
+                                                    Equipment__r.Maintenance_Cycle__c 
+                                            FROM Equipment_Maintenance_Items__r),
+                                            Status,
+                                            Subject  
+                                    FROM Case 
+                                    WHERE Status = 'New'
+                                    ORDER BY Subject ASC];
+        System.assertEquals(0, triggerCaseList.size());
+        
+    }
 
 }
