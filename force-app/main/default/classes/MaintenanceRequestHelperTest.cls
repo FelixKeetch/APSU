@@ -197,5 +197,24 @@ public with sharing class MaintenanceRequestHelperTest {
         System.assertEquals(0, triggerCaseList.size());
         
     }
-
+    @isTest
+    static void bulkTest(){
+        List<Case> repairCases = [SELECT Id,
+                                         Case.Vehicle__c, 
+                                        (SELECT Id, 
+                                                Name, 
+                                                Equipment__r.Maintenance_Cycle__c 
+                                         FROM Equipment_Maintenance_Items__r),
+                                        Status,
+                                        Subject  
+                                  FROM Case 
+                                  WHERE Type = 'Routine Maintenance' OR
+                                        Type = 'Repair'
+                                  ORDER BY Subject ASC];
+        for (Case c : repairCases) {
+            c.Status = 'Closed';
+        }
+        upsert repairCases;
+        System.assertEquals(repairCases.size(), [SELECT Id FROM Case WHERE Type = 'Routine Maintenance' AND Status = 'New'].size());                                  
+    }
 }
