@@ -195,7 +195,6 @@ public with sharing class MaintenanceRequestHelperTest {
                                     WHERE Status = 'New'
                                     ORDER BY Subject ASC];
         System.assertEquals(0, triggerCaseList.size());
-        
     }
     @isTest
     static void bulkTest(){
